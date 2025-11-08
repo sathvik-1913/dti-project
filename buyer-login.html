@@ -339,13 +339,22 @@
                 const storedPassword = localStorage.getItem('userPassword');
                 const storedUserType = localStorage.getItem('userType') || 'buyer';
 
+                // Debug information to help identify the issue
+                console.log('Entered credentials:', { username, password });
+                console.log('Stored credentials:', { storedEmail, storedPassword, storedUserType });
+
                 if (!username || !password) {
                     showMessage('Please fill in all fields', 'error');
                     return;
                 }
 
+                // Check if credentials match
                 if (username === storedEmail && password === storedPassword) {
                     showMessage('Login successful! Redirecting...', 'success');
+
+                    // Store login status
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('currentUser', username);
 
                     // Check if user is a buyer and redirect accordingly
                     setTimeout(() => {
@@ -358,7 +367,18 @@
                         }
                     }, 1500);
                 } else {
-                    showMessage('Invalid email or password. Please try again.', 'error');
+                    // More detailed error message
+                    let errorMsg = 'Invalid email or password. Please try again.';
+                    
+                    if (!storedEmail) {
+                        errorMsg += ' No user account found. Please sign up first.';
+                    } else if (username !== storedEmail) {
+                        errorMsg += ' Email does not match.';
+                    } else if (password !== storedPassword) {
+                        errorMsg += ' Password is incorrect.';
+                    }
+                    
+                    showMessage(errorMsg, 'error');
                 }
             });
 
@@ -397,5 +417,4 @@
         });
     </script>
 </body>
-
 </html>
